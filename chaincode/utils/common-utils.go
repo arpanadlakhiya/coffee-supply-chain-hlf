@@ -7,11 +7,6 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-const (
-	DOCTYPE_BATCH     = "batch"
-	BATCH_GROWN_EVENT = "BatchGrown"
-)
-
 func CreateCompositeKey(ctx contractapi.TransactionContextInterface, objectType string, id string) (string, error) {
 	key, err := ctx.GetStub().CreateCompositeKey(objectType, []string{id})
 	if err != nil {
