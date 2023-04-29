@@ -14,13 +14,13 @@ type SupplierContract struct {
 	contractapi.Contract
 }
 
-func (tc *SupplierContract) GrowBatch(ctx contractapi.TransactionContextInterface, batchID string) (bool, error) {
+func (sc *SupplierContract) SupplyBatch(ctx contractapi.TransactionContextInterface, batchID string) (bool, error) {
 	txnID := ctx.GetStub().GetTxID()
 
-	utils.LogMessage("SupplierContract.GrowBatch", "Recieved transaction to store a grown batch", batchID, txnID)
+	utils.LogMessage("SupplierContract.SupplyBatch", "Recieved transaction to store a supplied batch", batchID, txnID)
 
 	if batchID == "" {
-		return false, fmt.Errorf("SupplierContract.GrowBatch: Batch ID is empty")
+		return false, fmt.Errorf("SupplierContract.SupplyBatch: Batch ID is empty")
 	}
 
 	batchStr, err := utils.GetBatchFromTransient(ctx)
@@ -28,7 +28,7 @@ func (tc *SupplierContract) GrowBatch(ctx contractapi.TransactionContextInterfac
 		return false, fmt.Errorf("error while getting batch data from transient: %s", err)
 	}
 
-	var batch models.FarmerBatch
+	var batch models.SupplierBatch
 	err = json.Unmarshal(batchStr, &batch)
 	if err != nil {
 		return false, fmt.Errorf("failed to unmarshal JSON: %s", err)
@@ -39,17 +39,18 @@ func (tc *SupplierContract) GrowBatch(ctx contractapi.TransactionContextInterfac
 		return false, fmt.Errorf("error while creating batch. BatchId: %s, error: %w", batchID, err)
 	}
 
-	batchGrownEvent := models.BatchGrown{
+	batchSuppliedEvent := models.Batch{
 		BatchID: batchID,
 		TxnID:   txnID,
+		Org:     utils.SUPPLIER_ROLE,
 	}
 
-	err = utils.SetEvent(ctx, utils.BATCH_GROWN_EVENT, batchGrownEvent)
+	err = utils.SetEvent(ctx, utils.BATCH_SUPPLIED_EVENT, batchSuppliedEvent)
 	if err != nil {
 		return false, fmt.Errorf("error while setting event, %w", err)
 	}
 
-	utils.LogMessage("SupplierContract.GrowBatch", "Stored batch data on ledger", batchID, ctx.GetStub().GetTxID())
+	utils.LogMessage("SupplierContract.SupplyBatch", "Stored supply batch data on ledger", batchID, ctx.GetStub().GetTxID())
 
 	return true, nil
 }

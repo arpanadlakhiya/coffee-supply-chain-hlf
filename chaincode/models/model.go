@@ -2,6 +2,7 @@ package models
 
 type FarmerBatch struct {
 	BatchID             string  `json:"batchId"`
+	TxnID               string  `json:"txnId"`
 	BatchStatus         string  `json:"batchStatus"`
 	SeedType            string  `json:"seedType"`
 	PlantationDate      string  `json:"plantationDate"`
@@ -21,6 +22,7 @@ type FarmerBatch struct {
 
 type ProcessorBatch struct {
 	BatchID               string  `json:"batchId"`
+	TxnID                 string  `json:"txnId"`
 	BatchStatus           string  `json:"batchStatus"`
 	ProcessingType        string  `json:"processingType"`
 	DateOfTransport       string  `json:"dateOfTransport"`
@@ -46,6 +48,7 @@ type ProcessorBatch struct {
 
 type RoasterBatch struct {
 	BatchID             string  `json:"batchId"`
+	TxnID               string  `json:"txnId"`
 	BatchStatus         string  `json:"batchStatus"`
 	RoasingType         string  `json:"roasingType"`
 	DateOfTransport     string  `json:"dateOfTransport"`
@@ -72,6 +75,7 @@ type RoasterBatch struct {
 
 type SupplierBatch struct {
 	BatchID              string  `json:"batchId"`
+	TxnID                string  `json:"txnId"`
 	BatchStatus          string  `json:"batchStatus"`
 	DateOfTransport      string  `json:"dateOfTransport"`
 	RoasterName          string  `json:"roasterName"`
@@ -99,6 +103,7 @@ type SupplierBatch struct {
 
 type RetailerBatch struct {
 	BatchID                 string  `json:"batchId"`
+	TxnID                   string  `json:"txnId"`
 	BatchStatus             string  `json:"batchStatus"`
 	DateOfShipping          string  `json:"dateOfShipping"`
 	SupplierName            string  `json:"supplierName"`

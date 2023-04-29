@@ -7,6 +7,10 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
+type CommonUtils struct {
+	contractapi.Contract
+}
+
 func CreateCompositeKey(ctx contractapi.TransactionContextInterface, objectType string, id string) (string, error) {
 	key, err := ctx.GetStub().CreateCompositeKey(objectType, []string{id})
 	if err != nil {

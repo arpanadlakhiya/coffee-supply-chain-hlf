@@ -14,13 +14,13 @@ type RoasterContract struct {
 	contractapi.Contract
 }
 
-func (tc *RoasterContract) GrowBatch(ctx contractapi.TransactionContextInterface, batchID string) (bool, error) {
+func (roc *RoasterContract) RoastBatch(ctx contractapi.TransactionContextInterface, batchID string) (bool, error) {
 	txnID := ctx.GetStub().GetTxID()
 
-	utils.LogMessage("RoasterContract.GrowBatch", "Recieved transaction to store a grown batch", batchID, txnID)
+	utils.LogMessage("RoasterContract.RoastBatch", "Recieved transaction to store a roasted batch data", batchID, txnID)
 
 	if batchID == "" {
-		return false, fmt.Errorf("RoasterContract.GrowBatch: Batch ID is empty")
+		return false, fmt.Errorf("RoasterContract.RoastBatch: Batch ID is empty")
 	}
 
 	batchStr, err := utils.GetBatchFromTransient(ctx)
@@ -28,7 +28,7 @@ func (tc *RoasterContract) GrowBatch(ctx contractapi.TransactionContextInterface
 		return false, fmt.Errorf("error while getting batch data from transient: %s", err)
 	}
 
-	var batch models.FarmerBatch
+	var batch models.RoasterBatch
 	err = json.Unmarshal(batchStr, &batch)
 	if err != nil {
 		return false, fmt.Errorf("failed to unmarshal JSON: %s", err)
@@ -39,17 +39,18 @@ func (tc *RoasterContract) GrowBatch(ctx contractapi.TransactionContextInterface
 		return false, fmt.Errorf("error while creating batch. BatchId: %s, error: %w", batchID, err)
 	}
 
-	batchGrownEvent := models.BatchGrown{
+	batchRoastedEvent := models.Batch{
 		BatchID: batchID,
 		TxnID:   txnID,
+		Org:     utils.ROASTER_ROLE,
 	}
 
-	err = utils.SetEvent(ctx, utils.BATCH_GROWN_EVENT, batchGrownEvent)
+	err = utils.SetEvent(ctx, utils.BATCH_ROASTED_EVENT, batchRoastedEvent)
 	if err != nil {
 		return false, fmt.Errorf("error while setting event, %w", err)
 	}
 
-	utils.LogMessage("RoasterContract.GrowBatch", "Stored batch data on ledger", batchID, ctx.GetStub().GetTxID())
+	utils.LogMessage("RoasterContract.RoastBatch", "Stored roasted batch data on ledger", batchID, ctx.GetStub().GetTxID())
 
 	return true, nil
 }

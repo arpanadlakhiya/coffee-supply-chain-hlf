@@ -14,13 +14,13 @@ type ProcessorContract struct {
 	contractapi.Contract
 }
 
-func (tc *ProcessorContract) GrowBatch(ctx contractapi.TransactionContextInterface, batchID string) (bool, error) {
+func (pc *ProcessorContract) ProcessBatch(ctx contractapi.TransactionContextInterface, batchID string) (bool, error) {
 	txnID := ctx.GetStub().GetTxID()
 
-	utils.LogMessage("ProcessorContract.GrowBatch", "Recieved transaction to store a grown batch", batchID, txnID)
+	utils.LogMessage("ProcessorContract.ProcessBatch", "Recieved transaction to proces a batch", batchID, txnID)
 
 	if batchID == "" {
-		return false, fmt.Errorf("ProcessorContract.GrowBatch: Batch ID is empty")
+		return false, fmt.Errorf("ProcessorContract.ProcessBatch: Batch ID is empty")
 	}
 
 	batchStr, err := utils.GetBatchFromTransient(ctx)
@@ -28,7 +28,7 @@ func (tc *ProcessorContract) GrowBatch(ctx contractapi.TransactionContextInterfa
 		return false, fmt.Errorf("error while getting batch data from transient: %s", err)
 	}
 
-	var batch models.FarmerBatch
+	var batch models.ProcessorBatch
 	err = json.Unmarshal(batchStr, &batch)
 	if err != nil {
 		return false, fmt.Errorf("failed to unmarshal JSON: %s", err)
@@ -39,17 +39,18 @@ func (tc *ProcessorContract) GrowBatch(ctx contractapi.TransactionContextInterfa
 		return false, fmt.Errorf("error while creating batch. BatchId: %s, error: %w", batchID, err)
 	}
 
-	batchGrownEvent := models.BatchGrown{
+	batchProcessedEvent := models.Batch{
 		BatchID: batchID,
 		TxnID:   txnID,
+		Org:     utils.PROCESSOR_ROLE,
 	}
 
-	err = utils.SetEvent(ctx, utils.BATCH_GROWN_EVENT, batchGrownEvent)
+	err = utils.SetEvent(ctx, utils.BATCH_PROCESSED_EVENT, batchProcessedEvent)
 	if err != nil {
 		return false, fmt.Errorf("error while setting event, %w", err)
 	}
 
-	utils.LogMessage("ProcessorContract.GrowBatch", "Stored batch data on ledger", batchID, ctx.GetStub().GetTxID())
+	utils.LogMessage("ProcessorContract.ProcessBatch", "Stored batch processed data on ledger", batchID, ctx.GetStub().GetTxID())
 
 	return true, nil
 }
